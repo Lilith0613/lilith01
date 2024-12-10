@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>進階對決遊戲</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: url('img/bg.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            font-size: 24px;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px;
+        }
+        .player {
+            margin: 10px;
+            padding: 10px;
+            border: 2px solid #fff;
+            border-radius: 15px;
+            width: 200px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+        .player img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: none;
+            background-color: #6a5acd;
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #7b68ee;
+        }
+        .log {
+            margin: 20px auto;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border: 1px solid #fff;
+            width: 80%;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <header>進階對決遊戲</header>
+    <div>
+        <button onclick="startGame()">開始遊戲 (玩家 vs AI)</button>
+    </div>
+    <div class="container">
+        <div id="player1" class="player">
+            <h3>玩家 1</h3>
+            <img src="img/player1.png" alt="Player 1">
+            <p>生命值: <span id="player1Health">100</span></p>
+            <button onclick="attack('player1')">攻擊</button>
+        </div>
+        <div id="player2" class="player">
+            <h3>玩家 2</h3>
+            <img src="img/player2.png" alt="Player 2">
+            <p>生命值: <span id="player2Health">100</span></p>
+            <button onclick="attack('player2')">攻擊</button>
+        </div>
+    </div>
+    <div class="log" id="log"></div>
+    <script>
+        let player1 = { health: 100 };
+        let player2 = { health: 100 };
+        let isPlayerTurn = true;
+
+        function startGame() {
+            document.getElementById('log').innerHTML = '遊戲開始！';
+            resetGame();
+            isPlayerTurn = true;
+        }
+
+        function attack(attacker) {
+            const damage = Math.floor(Math.random() * 20) + 5; // 隨機傷害 5-25
+            if (attacker === 'player1') {
+                player2.health -= damage;
+                updateHealth('player2', player2.health);
+                logMessage(`玩家 1 攻擊玩家 2，造成 ${damage} 點傷害！`);
+                isPlayerTurn = false;
+                setTimeout(aiTurn, 1000); // 1 秒後 AI 攻擊
+            } else if (attacker === 'player2') {
+                player1.health -= damage;
+                updateHealth('player1', player1.health);
+                logMessage(`玩家 2 攻擊玩家 1，造成 ${damage} 點傷害！`);
+            }
+            checkWinner();
+        }
+
+        function aiTurn() {
+            if (!isPlayerTurn && player2.health > 0) {
+                attack('player2');
+                isPlayerTurn = true;
+            }
+        }
+
+        function updateHealth(playerId, health) {
+            document.getElementById(`${playerId}Health`).innerText = health > 0 ? health : 0;
+        }
+
+        function logMessage(message) {
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML += `<p>${message}</p>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function checkWinner() {
+            if (player1.health <= 0) {
+                alert('玩家 2 獲勝！');
+                resetGame();
+            } else if (player2.health <= 0) {
+                alert('玩家 1 獲勝！');
+                resetGame();
+            }
+        }
+
+        function resetGame() {
+            player1.health = 100;
+            player2.health = 100;
+            updateHealth('player1', player1.health);
+            updateHealth('player2', player2.health);
+            document.getElementById('log').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
